@@ -1,0 +1,14 @@
+{
+  "name": "dsh-swf-studio",
+  "version": "0.2.1",
+  "description": "SWF 场景工坊：餐厅宴会厅 60 款场景模板，中文文字编辑与本地 SWF 导出。",
+  "type": "module",
+  "main": "src/index.mjs",
+  "exports": { ".": "./src/index.mjs", "./client": "./lib/client.js", "./package.json": "./package.json" },
+  "engines": { "node": ">=22.19.0" },
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" }, "client": { "inject": ["@deepseek-ai/dsh-client-ui-renderer", "@deepseek-ai/dsh-client-ui-sidebar"], "platform": "web" } },
+  "files": ["src", "lib", "cordis.patch.yml", "README.md", "LICENSE", "docs"],
+  "scripts": { "build": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs", "prepack": "npm run build" },
+  "devDependencies": { "tsdown": "0.22.2" },
+  "license": "MIT"
+}

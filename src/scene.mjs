@@ -1,5 +1,6 @@
 import { templates } from './templates.mjs'
 import { drawDecorations } from './decorations.mjs'
+import { normalizeFloor, renderFloor } from './floor.mjs'
 export { templates, categories } from './templates.mjs'
 
 export function defaultProject(id = templates[0].id) {
@@ -16,10 +17,13 @@ export function normalizeProject(p) {
   }
   if (!d.title.trim()) throw new Error('请填写主标题。')
   if (!/^#[\da-f]{6}$/i.test(p.color)) throw new Error('请选择有效的文字颜色。')
-  if (!Number.isInteger(p.width) || !Number.isInteger(p.height) || p.width < 320 || p.height < 240 || p.width > 1920 || p.height > 1920 || p.width * p.height > 2073600) throw new Error('画面最大为 1920×1080 或 1080×1920。')
+  if (!Number.isInteger(p.width) || !Number.isInteger(p.height) || p.width < 320 || p.height < 240 || p.width > (p.profile==='floorled'?3000:1920) || p.height > 1920 || p.width * p.height > 2073600) throw new Error('画面尺寸无效；FloorLED 支持宽度到 3000 像素，总面积最多 2073600 像素。')
   if (![12, 24, 30].includes(p.fps) || !Number.isInteger(p.duration) || p.duration < 2 || p.duration > 30) throw new Error('时长为 2–30 秒，帧率为 12、24 或 30。')
   if (!['fade', 'rise', 'still'].includes(p.motion) || !['serif', 'sans-serif'].includes(p.font)) throw new Error('动画或字体选项无效。')
-  return { ...d, color: p.color, width: p.width, height: p.height, fps: p.fps, duration: p.duration, motion: p.motion, font: p.font }
+  const result = { ...d, color: p.color, width: p.width, height: p.height, fps: p.fps, duration: p.duration, motion: p.motion, font: p.font }
+  if(p.profile!==undefined&&!['standard','floorled'].includes(p.profile))throw new Error('输出模式无效。')
+  if(p.profile==='floorled')return {...result,schemaVersion:2,profile:'floorled',motion:'still',floor:normalizeFloor(p.floor,templates.find(t=>t.id===p.template),p.width,p.height)}
+  return result
 }
 export function fontFamily(style) {
   return style === 'sans-serif' ? '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif' : '"Songti SC", "SimSun", "Noto Serif CJK SC", serif'
@@ -35,6 +39,7 @@ function text(c, value, y, size, maxWidth, font, color, weight = '400') {
 /** Rasterize once; animation transforms only two reusable layers. */
 export function renderLayers(project, makeCanvas = () => document.createElement('canvas')) {
   const p = normalizeProject(project), t = templates.find(t => t.id === p.template)
+  if(p.profile==='floorled')return renderFloor(p,makeCanvas)
   const background = makeCanvas(), foreground = makeCanvas()
   for (const canvas of [background, foreground]) { canvas.width = p.width; canvas.height = p.height }
   const b = background.getContext('2d'), c = foreground.getContext('2d'), w = p.width, h = p.height, s = Math.min(w / 1280, h / 720)

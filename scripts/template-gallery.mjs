@@ -48,7 +48,7 @@ document.querySelector('#export').onclick=async event=>{
    const response=await fetch('/save/'+t.id,{method:'POST',headers:{'Content-Type':'image/png'},body:blob});if(!response.ok)throw new Error(await response.text());
   }
   const sheet=document.createElement('canvas');sheet.width=1920;sheet.height=110+Math.ceil(results.length/4)*340;
-  const ctx=sheet.getContext('2d');ctx.fillStyle='#f4f1eb';ctx.fillRect(0,0,sheet.width,sheet.height);ctx.fillStyle='#243e39';ctx.font='bold 36px system-ui';ctx.fillText('餐厅宴会厅 · 60 款场景预设',24,52);ctx.font='20px system-ui';ctx.fillText('11 类场景 · 所有文字可在 SWF 场景工坊中修改',24,86);
+  const ctx=sheet.getContext('2d');ctx.fillStyle='#f4f1eb';ctx.fillRect(0,0,sheet.width,sheet.height);ctx.fillStyle='#243e39';ctx.font='bold 36px system-ui';ctx.fillText('餐厅宴会厅 · 60 款场景预设',24,52);ctx.font='20px system-ui';ctx.fillText('11 类场景 · 所有文字可在 大澳渔庄灯光工作台中修改',24,86);
   const cards=[...gallery.querySelectorAll('canvas')];
   results.forEach((r,i)=>{const x=(i%4)*480,y=110+Math.floor(i/4)*340;ctx.drawImage(cards[i],x+10,y+5,460,259);ctx.fillStyle='#34312d';ctx.font='22px system-ui';ctx.fillText(r.name,x+14,y+294);ctx.fillStyle='#8b7d6b';ctx.font='17px system-ui';ctx.fillText(r.category,x+14,y+320);});
   const sheetResponse=await fetch('/contact-sheet',{method:'POST',headers:{'Content-Type':'image/png'},body:await new Promise(resolve=>sheet.toBlob(resolve,'image/png'))});if(!sheetResponse.ok)throw new Error(await sheetResponse.text());

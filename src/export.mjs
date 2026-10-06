@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, realpath, rename, rmdir, unlink, writeFile } from 'node
 import { homedir } from 'node:os'
 import path from 'node:path'
 import { normalizeProject } from './scene.mjs'
-import { encodeSwf } from './swf.mjs'
+import { encodeSwf, encodeFloorSwf } from './swf.mjs'
 
 export const DEFAULT_OUTPUT_DIRECTORY = path.join(homedir(), 'Downloads', 'IPZSK-SWF')
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
@@ -94,7 +94,8 @@ export async function exportProject(payload, { outputDirectory = DEFAULT_OUTPUT_
   const background = decodeBase64(payload.background, pixelBytes, '背景图层')
   const foreground = decodeBase64(payload.foreground, pixelBytes, '文字图层')
   const poster = decodePoster(payload.poster, project)
-  const swf = encodeSwf({ ...project, background, foreground })
+  const sprites = project.profile==='floorled' ? [0,1,2].map(i=>decodeBase64(payload.sprites?.[i],48*48*4,'动效图层')) : undefined
+  const swf = project.profile==='floorled' ? encodeFloorSwf({...project,background,foreground,sprites}) : encodeSwf({ ...project, background, foreground })
   const basename = safeBasename(project.title)
   let directory
   const written = []
